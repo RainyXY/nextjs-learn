@@ -1,4 +1,3 @@
-import { getChat } from './index';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 import { chatsTable, messagesTable } from './schema';
@@ -12,7 +11,7 @@ export const createChat = async (title: string, userId: string, model: string) =
 		const [newChat] = await db.insert(chatsTable).values({ title, userId, model }).returning();
 		return newChat;
 	} catch (error) {
-		console.error(error);
+		console.error('error creating chat:', error);
 		return null;
 	}
 };
