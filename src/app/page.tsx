@@ -5,6 +5,8 @@ import { useChat } from '@ai-sdk/react';
 import EastIcon from '@mui/icons-material/East';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
+import { useRouter } from 'next/navigation';
+import { useUser } from '@clerk/nextjs';
 
 export default function Home() {
 	const [input, setInput] = useState('');
@@ -14,7 +16,7 @@ export default function Home() {
 	};
 
 	const queryClient = useQueryClient();
-	const { user } = userUser();
+	const { user } = useUser();
 	const router = useRouter();
 	// Mutations
 	const { mutate: createChat } = useMutation({
