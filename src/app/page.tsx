@@ -3,13 +3,39 @@
 import { useState } from 'react';
 import { useChat } from '@ai-sdk/react';
 import EastIcon from '@mui/icons-material/East';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import axios from 'axios';
 
 export default function Home() {
 	const [input, setInput] = useState('');
 	const [model, setModel] = useState('deepseek-v3');
-	const { handleSubmit } = useChat({});
 	const handleChangeModel = () => {
 		setModel(model === 'deepseek-v3' ? 'deepseek-r1' : 'deepseek-v3');
+	};
+
+	const queryClient = useQueryClient();
+	const { user } = userUser();
+	const router = useRouter();
+	// Mutations
+	const { mutate: createChat } = useMutation({
+		mutationFn: async () => {
+			return axios.post('/api/create-chat', { title: input, model: model });
+		},
+		onSuccess: (res) => {
+			router.push(`/chat/${res.data.id}`);
+			queryClient.invalidateQueries({ queryKey: ['chats'] });
+		},
+	});
+	const handleSubmit = () => {
+		if (input.trim() === '') return;
+
+		if (!user) {
+			router.push('/sign-in');
+			return;
+		}
+
+		createChat();
+		setInput('');
 	};
 	return (
 		<div className='h-screen flex  flex-col items-center'>
