@@ -7,7 +7,7 @@ export async function POST(req: Request) {
 	const { userId } = await auth();
 	if (userId) {
 		//1.创建一个chat
-		const newChat = await createChat(title, model, userId);
+		const newChat = await createChat(title, userId, model);
 		//2.返回chat id
 		return new Response(JSON.stringify({ id: newChat?.id }), {
 			status: 200,
