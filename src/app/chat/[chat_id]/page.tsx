@@ -2,7 +2,7 @@
 
 import { useChat } from '@ai-sdk/react';
 import { DefaultChatTransport } from 'ai';
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect, useState, use } from 'react';
 import EastIcon from '@mui/icons-material/East';
 import { useParams } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
@@ -33,13 +33,15 @@ export default function Page() {
 	const handleChangeModel = () => {
 		setModel(model === 'deepseek-v3' ? 'deepseek-r1' : 'deepseek-v3');
 	};
-	const { messages, sendMessage } = useChat({
-		body: {
-			model: model,
-			chat_id: chat_id,
-			chat_user_id: chat?.data?.userId,
-		},
-		initialMessages: previousMessages?.data?.messages,
+	const { messages, sendMessage, append } = useChat({
+		transport: new DefaultChatTransport({
+			body: {
+				model: model,
+				chat_id: chat_id,
+				chat_user_id: chat?.data?.userId,
+			},
+			initialMessages: previousMessages?.data,
+		}),
 	});
 
 	const [input, setInput] = useState('');
@@ -50,6 +52,25 @@ export default function Page() {
 			endRef.current?.scrollIntoView({ behavior: 'smooth' });
 		}
 	}, [messages]);
+
+	const handleFirstMessage = async (model: string) => {
+		if (chat?.data?.title && previousMessages?.data?.length === 0) {
+			await append({
+				role: 'user',
+				content: chat?.data?.title,
+			}),
+				{
+					model: model,
+					chat_id: chat_id,
+					chat_user_id: chat?.data?.userId,
+				};
+		}
+	};
+
+	useEffect(() => {
+		setModel(chat?.data?.model);
+		handleFirstMessage(chat?.data?.model);
+	}, [chat?.data?.title, previousMessages]);
 
 	return (
 		<div className='flex  flex-col justify-between items-center h-screen'>
