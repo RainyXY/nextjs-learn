@@ -37,7 +37,6 @@ export default function Home() {
 		}
 
 		createChat();
-		setInput('');
 	};
 	return (
 		<div className='h-screen flex  flex-col items-center'>

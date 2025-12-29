@@ -24,7 +24,7 @@ export default function Page() {
 			body: {
 				model: model,
 				chat_id: chat_id,
-				chat_user_id: chat?.data?.chat_userId,
+				chat_user_id: chat?.data?.userId,
 			},
 		}),
 	});
