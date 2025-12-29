@@ -12,21 +12,34 @@ export default function Page() {
 	const { data: chat } = useQuery({
 		queryKey: ['chat', chat_id],
 		queryFn: () => {
-			return axios.post(`/api/get-chat`, { chat_id: chat_id });
+			return axios.post(`/api/get-chat`, {
+				chat_id: chat_id,
+			});
 		},
 	});
+
+	const { data: previousMessages } = useQuery({
+		queryKey: ['messages', chat_id],
+		queryFn: () => {
+			return axios.post(`/api/get-messages`, {
+				chat_id: chat_id,
+				chat_user_id: chat?.data?.userId,
+			});
+		},
+		enabled: !!chat?.data?.id,
+	});
+
 	const [model, setModel] = useState('deepseek-v3');
 	const handleChangeModel = () => {
 		setModel(model === 'deepseek-v3' ? 'deepseek-r1' : 'deepseek-v3');
 	};
 	const { messages, sendMessage } = useChat({
-		transport: new DefaultChatTransport({
-			body: {
-				model: model,
-				chat_id: chat_id,
-				chat_user_id: chat?.data?.userId,
-			},
-		}),
+		body: {
+			model: model,
+			chat_id: chat_id,
+			chat_user_id: chat?.data?.userId,
+		},
+		initialMessages: previousMessages?.data?.messages,
 	});
 
 	const [input, setInput] = useState('');
